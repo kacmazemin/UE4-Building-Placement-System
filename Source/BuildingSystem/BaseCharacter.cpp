@@ -3,6 +3,7 @@
 
 #include "BaseCharacter.h"
 #include "Components/InputComponent.h"
+#include "BuilderComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -10,6 +11,8 @@ ABaseCharacter::ABaseCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	BuilderComponent = CreateDefaultSubobject<UBuilderComponent>(TEXT("BuilderComponent"));
+	
 }
 
 // Called when the game starts or when spawned
@@ -36,6 +39,8 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAxis("Turn", this, &ABaseCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &ABaseCharacter::AddControllerPitchInput);
+
+	PlayerInputComponent->BindAction("ToggleBuildMode",IE_Pressed, BuilderComponent, &UBuilderComponent::ToggleBuildMode);
 }
 
 void ABaseCharacter::MoveForward(float Value)
