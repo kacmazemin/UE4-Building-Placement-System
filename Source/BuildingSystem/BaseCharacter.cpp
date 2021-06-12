@@ -2,6 +2,7 @@
 
 
 #include "BaseCharacter.h"
+#include "Components/InputComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -30,5 +31,20 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAxis("MoveRight", this, &ABaseCharacter::MoveRight);
+	PlayerInputComponent->BindAxis("MoveForward", this, &ABaseCharacter::MoveForward);
+
+	PlayerInputComponent->BindAxis("Turn", this, &ABaseCharacter::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("LookUp", this, &ABaseCharacter::AddControllerPitchInput);
+}
+
+void ABaseCharacter::MoveForward(float Value)
+{
+	AddMovementInput(GetActorForwardVector(), Value);
+}
+
+void ABaseCharacter::MoveRight(float Value)
+{
+	AddMovementInput(GetActorRightVector(), Value);
 }
 
