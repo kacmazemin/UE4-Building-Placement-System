@@ -25,7 +25,13 @@ public:
 	void PerformBuild();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Config")
-	float BuildDistance = 100.f;
+	float BuildDistance = 400.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Config")
+	float FloorHeight = 20.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Config")
+	float GridSize = 200.f;
 	
 protected:
 	// Called when the game starts
@@ -36,5 +42,12 @@ private:
 
 	bool bIsBuilderModeActive = false;
 
-		
+	void LineTraceForBuild() const;
+
+	FVector GetBuildLocation() const;
+	FRotator GetBuildRotation() const;
+
+	UPROPERTY()
+	class UCameraComponent* CameraComponent = nullptr;
+	
 };
