@@ -58,11 +58,11 @@ void UBuilderComponent::LineTraceForBuild()
 	{
 		if(CurrentBuildableActor == nullptr)
 		{
-			CurrentBuildableActor = GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, GetBuildLocation(), GetBuildRotation(), FActorSpawnParameters());
+			CurrentBuildableActor = GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, GetBuildLocation(), CurrentRotation, FActorSpawnParameters());
 		}
 		else
 		{
-			CurrentBuildableActor->SetActorLocationAndRotation(GetBuildLocation(), GetBuildRotation());
+			CurrentBuildableActor->SetActorLocationAndRotation(GetBuildLocation(), CurrentRotation);
 		}
 	}
 }
@@ -91,7 +91,22 @@ void UBuilderComponent::PerformBuild()
 {
 	if(bIsBuilderModeActive && CurrentBuildableActor != nullptr)
 	{
-		GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, GetBuildLocation(), GetBuildRotation(), FActorSpawnParameters());
+		GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, GetBuildLocation(), CurrentRotation, FActorSpawnParameters());
+	}
+}
+
+void UBuilderComponent::RotateBuild()
+{
+	if(bIsBuilderModeActive && CurrentBuildableActor != nullptr)
+	{
+		if(CurrentRotation.Yaw == 90 || CurrentRotation.Yaw == 270)
+		{
+			CurrentRotation.Yaw = 0;
+		}
+		else if(CurrentRotation.Yaw == 0 || CurrentRotation.Yaw == 180 || CurrentRotation.Yaw == 360 )
+		{
+			CurrentRotation.Yaw = 90;
+		}
 	}
 }
 

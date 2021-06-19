@@ -26,6 +26,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void PerformBuild();
 
+	UFUNCTION(BlueprintCallable)
+	void RotateBuild();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	float BuildDistance = 400.f;
 
@@ -55,5 +58,7 @@ private:
 	UCameraComponent* CameraComponent = nullptr;
 
 	UPROPERTY()
-	ABuildableActor* CurrentBuildableActor = nullptr; 
+	ABuildableActor* CurrentBuildableActor = nullptr;
+
+	FRotator CurrentRotation = FRotator::ZeroRotator;
 };
