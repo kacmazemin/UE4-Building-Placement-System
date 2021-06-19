@@ -42,6 +42,7 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAction("ToggleBuildMode",IE_Pressed, BuilderComponent, &UBuilderComponent::ToggleBuildMode);
 	PlayerInputComponent->BindAction("PerformBuild",IE_Pressed, BuilderComponent, &UBuilderComponent::PerformBuild);
+	PlayerInputComponent->BindAction("RotateBuilding",IE_Pressed, BuilderComponent, &UBuilderComponent::RotateBuild);
 
 }
 
