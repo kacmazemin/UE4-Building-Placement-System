@@ -41,6 +41,8 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("LookUp", this, &ABaseCharacter::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("ToggleBuildMode",IE_Pressed, BuilderComponent, &UBuilderComponent::ToggleBuildMode);
+	PlayerInputComponent->BindAction("PerformBuild",IE_Pressed, BuilderComponent, &UBuilderComponent::PerformBuild);
+
 }
 
 void ABaseCharacter::MoveForward(float Value)
