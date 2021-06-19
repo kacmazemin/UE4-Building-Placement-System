@@ -4,6 +4,7 @@
 #include "BuilderComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Camera/CameraComponent.h"
+#include "BuildableActor.h"
 
 // Sets default values for this component's properties
 UBuilderComponent::UBuilderComponent()
@@ -40,7 +41,7 @@ void UBuilderComponent::BeginPlay()
 
 }
 
-void UBuilderComponent::LineTraceForBuild() const
+void UBuilderComponent::LineTraceForBuild()
 {
 	FHitResult HitResult;
 	FVector StartLocation;
@@ -49,15 +50,20 @@ void UBuilderComponent::LineTraceForBuild() const
 
 	if(CameraComponent)
 	{
-		StartLocation = CameraComponent->GetForwardVector() * 2;
+		StartLocation = CameraComponent->GetComponentLocation();
+		EndLocation = StartLocation + CameraComponent->GetForwardVector() * 500.f;
 	}
 
-	DrawDebugBox(GetWorld(), GetBuildLocation(), FVector(100.f,100.f,100.f), GetBuildRotation().Quaternion(), FColor::Orange);
-	
-
-	if(GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECollisionChannel::ECC_WorldStatic))
+	if(GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility))
 	{
-		DrawDebugLine(GetWorld(), StartLocation, HitResult.Location, FColor::Emerald, false, 2.f);
+		if(CurrentBuildableActor == nullptr)
+		{
+			CurrentBuildableActor = GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, GetBuildLocation(), GetBuildRotation(), FActorSpawnParameters());
+		}
+		else
+		{
+			CurrentBuildableActor->SetActorLocationAndRotation(GetBuildLocation(), GetBuildRotation());
+		}
 	}
 }
 
@@ -71,7 +77,7 @@ FVector UBuilderComponent::GetBuildLocation() const
 
 FRotator UBuilderComponent::GetBuildRotation() const
 {
-	FRotator Rotation = CameraComponent->GetComponentRotation();
+	const FRotator Rotation = CameraComponent->GetComponentRotation();
 
 	return FRotator(0, FMath::GridSnap(Rotation.Yaw, 90.f), 0);
 }
@@ -83,9 +89,9 @@ void UBuilderComponent::ToggleBuildMode()
 
 void UBuilderComponent::PerformBuild()
 {
-	if(bIsBuilderModeActive)
+	if(bIsBuilderModeActive && CurrentBuildableActor != nullptr)
 	{
-		//todo
+		GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, GetBuildLocation(), GetBuildRotation(), FActorSpawnParameters());
 	}
 }
 

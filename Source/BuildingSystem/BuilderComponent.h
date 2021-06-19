@@ -6,9 +6,11 @@
 #include "Components/ActorComponent.h"
 #include "BuilderComponent.generated.h"
 
+class ABuildableActor;
+class UCameraComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class BUILDINGSYSTEM_API UBuilderComponent : public UActorComponent
+class BUILDINGSYSTEM_API UBuilderComponent final : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -24,30 +26,34 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void PerformBuild();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Config")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	float BuildDistance = 400.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Config")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	float FloorHeight = 20.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Config")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
 	float GridSize = 200.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
+	TSubclassOf<ABuildableActor> BuildableActor = nullptr;
 	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
 	
 private:
 
 	bool bIsBuilderModeActive = false;
 
-	void LineTraceForBuild() const;
+	void LineTraceForBuild();
 
 	FVector GetBuildLocation() const;
 	FRotator GetBuildRotation() const;
 
 	UPROPERTY()
-	class UCameraComponent* CameraComponent = nullptr;
-	
+	UCameraComponent* CameraComponent = nullptr;
+
+	UPROPERTY()
+	ABuildableActor* CurrentBuildableActor = nullptr; 
 };
