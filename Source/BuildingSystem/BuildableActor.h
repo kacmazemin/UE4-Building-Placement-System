@@ -20,6 +20,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+	void EnableGhostMaterial();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
+	UMaterial* GhostMaterial = nullptr;
 
 protected:
 	// Called when the game starts or when spawned

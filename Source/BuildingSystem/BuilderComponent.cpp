@@ -59,6 +59,7 @@ void UBuilderComponent::LineTraceForBuild()
 		if(CurrentBuildableActor == nullptr)
 		{
 			CurrentBuildableActor = GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, GetBuildLocation(), CurrentRotation, FActorSpawnParameters());
+			CurrentBuildableActor->EnableGhostMaterial();
 		}
 		else
 		{
@@ -91,7 +92,8 @@ void UBuilderComponent::PerformBuild()
 {
 	if(bIsBuilderModeActive && CurrentBuildableActor != nullptr)
 	{
-		GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, GetBuildLocation(), CurrentRotation, FActorSpawnParameters());
+		const ABuildableActor* SpawnedActor = GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, GetBuildLocation(), CurrentRotation, FActorSpawnParameters());
+
 	}
 }
 
@@ -109,4 +111,3 @@ void UBuilderComponent::RotateBuild()
 		}
 	}
 }
-

@@ -31,3 +31,11 @@ void ABuildableActor::Tick(float DeltaTime)
 
 }
 
+void ABuildableActor::EnableGhostMaterial()
+{
+	if(MeshComponent && GhostMaterial != nullptr)
+	{
+		MeshComponent->SetMaterial(0, GhostMaterial);
+	}
+}
+
