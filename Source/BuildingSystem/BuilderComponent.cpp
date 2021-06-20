@@ -46,6 +46,7 @@ void UBuilderComponent::LineTraceForBuild()
 	FHitResult HitResult;
 	FVector StartLocation;
 	FVector EndLocation;
+	FCollisionQueryParams QueryParams;
 
 
 	if(CameraComponent)
@@ -54,16 +55,28 @@ void UBuilderComponent::LineTraceForBuild()
 		EndLocation = StartLocation + CameraComponent->GetForwardVector() * 500.f;
 	}
 
-	if(GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility))
+	if(CurrentBuildableActor != nullptr)
 	{
+		QueryParams.AddIgnoredActor(CurrentBuildableActor);
+	}
+		
+	if(GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility, QueryParams))
+	{
+		DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Magenta, false, 1.f);
 		if(CurrentBuildableActor == nullptr)
 		{
 			CurrentBuildableActor = GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, GetBuildLocation(), CurrentRotation, FActorSpawnParameters());
-			CurrentBuildableActor->EnableGhostMaterial();
+			CurrentBuildableActor->EnableGhostMode();
 		}
 		else
 		{
 			CurrentBuildableActor->SetActorLocationAndRotation(GetBuildLocation(), CurrentRotation);
+		}
+
+		if(const auto BuildableActorRef = Cast<ABuildableActor>((HitResult.GetActor())))
+		{
+			const FVector InverseVector = BuildableActorRef->GetActorTransform().InverseTransformPosition(HitResult.Location);
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Cyan, InverseVector.ToString());
 		}
 	}
 }
