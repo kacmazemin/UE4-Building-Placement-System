@@ -3,6 +3,8 @@
 
 #include "BuildableActor.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/BoxComponent.h"
+#include "Engine/CollisionProfile.h"
 
 // Sets default values
 ABuildableActor::ABuildableActor()
@@ -15,13 +17,26 @@ ABuildableActor::ABuildableActor()
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	MeshComponent->SetupAttachment(RootComponent);
 
+	BoxCompoent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
+	BoxCompoent->SetupAttachment(MeshComponent);
+	BoxCompoent->SetCollisionProfileName(UCollisionProfile::BlockAll_ProfileName);
+
 }
 
 // Called when the game starts or when spawned
 void ABuildableActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if(const auto MeshComponentRef = MeshComponent->GetStaticMesh())
+	{
+		const FVector MeshVector = MeshComponent->GetRelativeLocation();
+		
+		MeshComponent->SetRelativeLocation(
+			FVector{MeshVector.X, MeshVector.Y, MeshComponentRef->GetBounds().BoxExtent.Z});
+		
+		BoxCompoent->SetBoxExtent(MeshComponent->GetStaticMesh()->GetBounds().BoxExtent);
+	}	
 }
 
 // Called every frame
@@ -31,11 +46,12 @@ void ABuildableActor::Tick(float DeltaTime)
 
 }
 
-void ABuildableActor::EnableGhostMaterial()
+void ABuildableActor::EnableGhostMode()
 {
 	if(MeshComponent && GhostMaterial != nullptr)
 	{
 		MeshComponent->SetMaterial(0, GhostMaterial);
+		BoxCompoent->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
 	}
 }
 

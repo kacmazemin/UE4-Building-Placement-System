@@ -7,6 +7,7 @@
 #include "BuildableActor.generated.h"
 
 class UStaticMeshComponent;
+class UBoxComponent;
 
 UCLASS()
 class BUILDINGSYSTEM_API ABuildableActor : public AActor
@@ -21,7 +22,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-	void EnableGhostMaterial();
+	void EnableGhostMode();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	UMaterial* GhostMaterial = nullptr;
@@ -32,4 +33,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* MeshComponent = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
+	UBoxComponent* BoxCompoent = nullptr;
 };
