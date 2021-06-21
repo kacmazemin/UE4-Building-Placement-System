@@ -4,6 +4,7 @@
 #include "BuildableActor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/SceneComponent.h"
 #include "Engine/CollisionProfile.h"
 
 // Sets default values
@@ -17,9 +18,9 @@ ABuildableActor::ABuildableActor()
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	MeshComponent->SetupAttachment(RootComponent);
 
-	BoxCompoent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
-	BoxCompoent->SetupAttachment(MeshComponent);
-	BoxCompoent->SetCollisionProfileName(UCollisionProfile::BlockAll_ProfileName);
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
+	BoxComponent->SetupAttachment(MeshComponent);
+	BoxComponent->SetCollisionProfileName(UCollisionProfile::BlockAll_ProfileName);
 
 }
 
@@ -28,15 +29,24 @@ void ABuildableActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(const auto MeshComponentRef = MeshComponent->GetStaticMesh())
+
+}
+
+void ABuildableActor::OnConstruction(const FTransform& Transform)
+{
+	if(const UStaticMesh* SMComponent = MeshComponent->GetStaticMesh())
 	{
-		const FVector MeshVector = MeshComponent->GetRelativeLocation();
+		const FVector MeshLocation = MeshComponent->GetRelativeLocation();
+	
+		MeshComponent->SetRelativeLocation(FVector{
+            MeshLocation.X,
+            MeshLocation.Y,
+            SMComponent->GetBounds().BoxExtent.Z});
+ 
+		BoxComponent->SetBoxExtent(MeshComponent->GetStaticMesh()->GetBounds().BoxExtent);
 		
-		MeshComponent->SetRelativeLocation(
-			FVector{MeshVector.X, MeshVector.Y, MeshComponentRef->GetBounds().BoxExtent.Z});
+	}
 		
-		BoxCompoent->SetBoxExtent(MeshComponent->GetStaticMesh()->GetBounds().BoxExtent);
-	}	
 }
 
 // Called every frame
@@ -51,7 +61,9 @@ void ABuildableActor::EnableGhostMode()
 	if(MeshComponent && GhostMaterial != nullptr)
 	{
 		MeshComponent->SetMaterial(0, GhostMaterial);
-		BoxCompoent->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+		MeshComponent->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+		BoxComponent->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+		BoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 

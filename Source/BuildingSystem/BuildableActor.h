@@ -8,6 +8,7 @@
 
 class UStaticMeshComponent;
 class UBoxComponent;
+class USceneComponent;
 
 UCLASS()
 class BUILDINGSYSTEM_API ABuildableActor : public AActor
@@ -21,6 +22,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+
 	UFUNCTION()
 	void EnableGhostMode();
 	
@@ -31,9 +33,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere)
+	virtual void OnConstruction(const FTransform& Transform) override;
+
+	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* MeshComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere)
-	UBoxComponent* BoxCompoent = nullptr;
+	UBoxComponent* BoxComponent = nullptr;
+
 };

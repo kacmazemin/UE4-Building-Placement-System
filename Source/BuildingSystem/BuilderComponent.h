@@ -29,13 +29,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RotateBuild();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Config")
 	float BuildDistance = 400.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Config")
 	float FloorHeight = 20.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Config")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Config")
 	float GridSize = 200.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")

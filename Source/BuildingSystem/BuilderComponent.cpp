@@ -62,7 +62,6 @@ void UBuilderComponent::LineTraceForBuild()
 		
 	if(GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility, QueryParams))
 	{
-		DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Magenta, false, 1.f);
 		if(CurrentBuildableActor == nullptr)
 		{
 			CurrentBuildableActor = GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, GetBuildLocation(), CurrentRotation, FActorSpawnParameters());
