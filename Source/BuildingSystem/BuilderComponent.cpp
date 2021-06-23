@@ -52,7 +52,7 @@ void UBuilderComponent::LineTraceForBuild()
 	if(CameraComponent)
 	{
 		StartLocation = CameraComponent->GetComponentLocation();
-		EndLocation = StartLocation + CameraComponent->GetForwardVector() * 500.f;
+		EndLocation = StartLocation + CameraComponent->GetForwardVector() * 20000.f;
 	}
 
 	if(CurrentBuildableActor != nullptr)
@@ -69,13 +69,27 @@ void UBuilderComponent::LineTraceForBuild()
 		}
 		else
 		{
-			CurrentBuildableActor->SetActorLocationAndRotation(GetBuildLocation(), CurrentRotation);
+			CurrentBuildableActor->SetActorLocationAndRotation(HitResult.Location, CurrentRotation);
 		}
 
 		if(const auto BuildableActorRef = Cast<ABuildableActor>((HitResult.GetActor())))
 		{
 			const FVector InverseVector = BuildableActorRef->GetActorTransform().InverseTransformPosition(HitResult.Location);
-			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Cyan, InverseVector.ToString());
+
+			float OffSetX = 0; 
+			float OffSetY = 0; 
+			
+			if(FMath::Abs(InverseVector.X) > FMath::Abs(InverseVector.Y))
+			{
+				OffSetX = 400 * FMath::Sign(InverseVector.X);
+			}
+			else
+			{
+				OffSetY = 400 * FMath::Sign(InverseVector.Y);
+			}
+			
+			CurrentBuildableActor->SetActorLocationAndRotation(BuildableActorRef->GetActorTransform().GetLocation(), CurrentRotation);
+			CurrentBuildableActor->AddActorLocalOffset(FVector{OffSetX, OffSetY, 0});
 		}
 	}
 }
@@ -104,7 +118,7 @@ void UBuilderComponent::PerformBuild()
 {
 	if(bIsBuilderModeActive && CurrentBuildableActor != nullptr)
 	{
-		const ABuildableActor* SpawnedActor = GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, GetBuildLocation(), CurrentRotation, FActorSpawnParameters());
+		const ABuildableActor* SpawnedActor = GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, CurrentBuildableActor->GetActorLocation(), CurrentRotation, FActorSpawnParameters());
 
 	}
 }
