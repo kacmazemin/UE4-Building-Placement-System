@@ -70,7 +70,7 @@ void UBuilderComponent::LineTraceForBuild()
 		else
 		{
 			TArray<AActor*> OverlappingActors;
-			CurrentBuildableActor->GetOverlappingActors(OverlappingActors, TSubclassOf<ABuildableActor>());
+			CurrentBuildableActor->GetOverlappingActors(OverlappingActors, ABuildableActor::StaticClass());
 
 			if(OverlappingActors.Num() > 0)
 			{
@@ -119,8 +119,7 @@ void UBuilderComponent::PerformBuild()
 {
 	if(bCanBuild && bIsBuilderModeActive && CurrentBuildableActor != nullptr)
 	{
-		const ABuildableActor* SpawnedActor = GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, CurrentBuildableActor->GetActorLocation(), CurrentRotation, FActorSpawnParameters());
-
+		 GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, CurrentBuildableActor->GetActorLocation(), CurrentRotation, FActorSpawnParameters());
 	}
 	else
 	{
