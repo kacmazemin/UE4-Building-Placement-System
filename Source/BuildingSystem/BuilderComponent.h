@@ -46,13 +46,11 @@ protected:
 	virtual void BeginPlay() override;
 	
 private:
+	bool bCanBuild = false;
 
 	bool bIsBuilderModeActive = false;
 
 	void LineTraceForBuild();
-
-	FVector GetBuildLocation() const;
-	FRotator GetBuildRotation() const;
 
 	UPROPERTY()
 	UCameraComponent* CameraComponent = nullptr;

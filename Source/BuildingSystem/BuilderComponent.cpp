@@ -64,49 +64,50 @@ void UBuilderComponent::LineTraceForBuild()
 	{
 		if(CurrentBuildableActor == nullptr)
 		{
-			CurrentBuildableActor = GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, GetBuildLocation(), CurrentRotation, FActorSpawnParameters());
+			CurrentBuildableActor = GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, HitResult.Location, CurrentRotation, FActorSpawnParameters());
 			CurrentBuildableActor->EnableGhostMode();
 		}
 		else
 		{
+			TArray<AActor*> OverlappingActors;
+			CurrentBuildableActor->GetOverlappingActors(OverlappingActors, TSubclassOf<ABuildableActor>());
+
+			if(OverlappingActors.Num() > 0)
+			{
+				CurrentBuildableActor->SetCannotBuildStyle();
+				bCanBuild = false;
+			}
+			else
+			{
+				CurrentBuildableActor->SetBuildableStyle();
+				bCanBuild = true;
+			}
+			
 			CurrentBuildableActor->SetActorLocationAndRotation(HitResult.Location, CurrentRotation);
+
 		}
 
 		if(const auto BuildableActorRef = Cast<ABuildableActor>((HitResult.GetActor())))
 		{
 			const FVector InverseVector = BuildableActorRef->GetActorTransform().InverseTransformPosition(HitResult.Location);
 
+			//todo add dynmic offset logic 
 			float OffSetX = 0; 
 			float OffSetY = 0; 
 			
 			if(FMath::Abs(InverseVector.X) > FMath::Abs(InverseVector.Y))
 			{
-				OffSetX = 400 * FMath::Sign(InverseVector.X);
+				OffSetX = 401 * FMath::Sign(InverseVector.X);
 			}
 			else
 			{
-				OffSetY = 400 * FMath::Sign(InverseVector.Y);
+				OffSetY = 401 * FMath::Sign(InverseVector.Y);
 			}
 			
 			CurrentBuildableActor->SetActorLocationAndRotation(BuildableActorRef->GetActorTransform().GetLocation(), CurrentRotation);
 			CurrentBuildableActor->AddActorLocalOffset(FVector{OffSetX, OffSetY, 0});
 		}
 	}
-}
-
-FVector UBuilderComponent::GetBuildLocation() const
-{
-	FVector Vector = CameraComponent->GetForwardVector() * BuildDistance;
-	Vector += GetOwner()->GetActorLocation();
-
-	return FVector(FMath::GridSnap(Vector.X, GridSize), FMath::GridSnap(Vector.Y, GridSize), FloorHeight);
-}
-
-FRotator UBuilderComponent::GetBuildRotation() const
-{
-	const FRotator Rotation = CameraComponent->GetComponentRotation();
-
-	return FRotator(0, FMath::GridSnap(Rotation.Yaw, 90.f), 0);
 }
 
 void UBuilderComponent::ToggleBuildMode()
@@ -116,10 +117,14 @@ void UBuilderComponent::ToggleBuildMode()
 
 void UBuilderComponent::PerformBuild()
 {
-	if(bIsBuilderModeActive && CurrentBuildableActor != nullptr)
+	if(bCanBuild && bIsBuilderModeActive && CurrentBuildableActor != nullptr)
 	{
 		const ABuildableActor* SpawnedActor = GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, CurrentBuildableActor->GetActorLocation(), CurrentRotation, FActorSpawnParameters());
 
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("Build Position is wrong"));
 	}
 }
 
