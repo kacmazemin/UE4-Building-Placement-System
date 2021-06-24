@@ -9,6 +9,7 @@
 class UStaticMeshComponent;
 class UBoxComponent;
 class USceneComponent;
+class UMaterialInstanceDynamic;
 
 UCLASS()
 class BUILDINGSYSTEM_API ABuildableActor : public AActor
@@ -22,12 +23,17 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-
 	UFUNCTION()
 	void EnableGhostMode();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
 	UMaterial* GhostMaterial = nullptr;
+
+	UFUNCTION()
+	void SetBuildableStyle();
+
+	UFUNCTION()
+    void SetCannotBuildStyle();
 
 protected:
 	// Called when the game starts or when spawned
@@ -41,4 +47,6 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UBoxComponent* BoxComponent = nullptr;
 
+	UPROPERTY()
+	UMaterialInstanceDynamic* MaterialInstanceDynamic = nullptr;
 };

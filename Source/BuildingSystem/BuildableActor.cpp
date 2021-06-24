@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/SceneComponent.h"
 #include "Engine/CollisionProfile.h"
+#include "Engine/EngineTypes.h"
 
 // Sets default values
 ABuildableActor::ABuildableActor()
@@ -20,7 +21,7 @@ ABuildableActor::ABuildableActor()
 
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
 	BoxComponent->SetupAttachment(MeshComponent);
-	BoxComponent->SetCollisionProfileName(UCollisionProfile::BlockAll_ProfileName);
+	BoxComponent->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
 
 }
 
@@ -29,6 +30,7 @@ void ABuildableActor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	MaterialInstanceDynamic = UMaterialInstanceDynamic::Create(GhostMaterial, this);
 
 }
 
@@ -44,7 +46,7 @@ void ABuildableActor::OnConstruction(const FTransform& Transform)
             SMComponent->GetBounds().BoxExtent.Z});
  
 		BoxComponent->SetBoxExtent(MeshComponent->GetStaticMesh()->GetBounds().BoxExtent);
-		
+	
 	}
 		
 }
@@ -60,10 +62,27 @@ void ABuildableActor::EnableGhostMode()
 {
 	if(MeshComponent && GhostMaterial != nullptr)
 	{
-		MeshComponent->SetMaterial(0, GhostMaterial);
+		MeshComponent->SetMaterial(0, MaterialInstanceDynamic);
 		MeshComponent->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
 		BoxComponent->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
-		BoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		BoxComponent->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
+
 	}
 }
 
+void ABuildableActor::SetBuildableStyle()
+{
+	if(MaterialInstanceDynamic)
+	{
+		MaterialInstanceDynamic->SetVectorParameterValue(FName("BaseColorVec"), {0.25, 0.2, 0.85, 0});
+	}
+}
+
+void ABuildableActor::SetCannotBuildStyle()
+{
+	if(MaterialInstanceDynamic)
+	{
+		MaterialInstanceDynamic->SetVectorParameterValue(FName("BaseColorVec"), {0.85, 0.25, 0.25, 0});
+	}
+}
