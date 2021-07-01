@@ -108,14 +108,14 @@ void UBuilderComponent::LineTraceForBuild()
 		
 			if(FMath::Abs(InverseVector.X) > FMath::Abs(InverseVector.Y))
 			{
-				OffSetX = (BuildableActorRef->GetMeshOffset().X * .5f +
-						   CurrentBuildableActor->GetMeshOffset().X * .5f +
+				OffSetX = (BuildableActorRef->GetMeshSize().X * .5f +
+						   CurrentBuildableActor->GetMeshSize().X * .5f +
 						   (SpaceBetweenMeshes)) * FMath::Sign(InverseVector.X);
 			}
 			else
 			{
-				OffSetY = (BuildableActorRef->GetMeshOffset().Y * .5f +
-						   CurrentBuildableActor->GetMeshOffset().Y * .5f +
+				OffSetY = (BuildableActorRef->GetMeshSize().Y * .5f +
+						   CurrentBuildableActor->GetMeshSize().Y * .5f +
 						   (SpaceBetweenMeshes)) * FMath::Sign(InverseVector.Y);
 			}
 			
