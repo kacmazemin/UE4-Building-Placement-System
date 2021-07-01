@@ -9,6 +9,8 @@
 class ABuildableActor;
 class UCameraComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeBuildDelegate, TSubclassOf<ABuildableActor>, BuildActor);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BUILDINGSYSTEM_API UBuilderComponent final : public UActorComponent
 {
@@ -28,24 +30,25 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void RotateBuild();
+	
+	UFUNCTION(BlueprintCallable)
+	void ChangeBuild(TSubclassOf<ABuildableActor> BuildActor);
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Config")
-	float BuildDistance = 400.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Config")
-	float FloorHeight = 20.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Config")
-	float GridSize = 200.f;
+	TSubclassOf<ABuildableActor> BuildableActor = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
-	TSubclassOf<ABuildableActor> BuildableActor = nullptr;
+	TArray<TSubclassOf<ABuildableActor>> BuildableActors;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnChangeBuildDelegate OnChangeBuildDelegate;
 	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 	
 private:
+	float SpaceBetweenMeshes = 0.5f;
+	
 	bool bCanBuild = false;
 
 	bool bIsBuilderModeActive = false;

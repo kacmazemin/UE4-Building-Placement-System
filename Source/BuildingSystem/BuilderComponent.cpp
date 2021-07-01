@@ -2,6 +2,8 @@
 
 
 #include "BuilderComponent.h"
+
+#include "AssetRegistryModule.h"
 #include "DrawDebugHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "BuildableActor.h"
@@ -13,7 +15,6 @@ UBuilderComponent::UBuilderComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
 }
 
 // Called every frame
@@ -39,6 +40,18 @@ void UBuilderComponent::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("There is not any camera component"))
 	}
 
+	if(BuildableActors.Num() > 0)
+	{
+		BuildableActor = BuildableActors[0];
+	}
+	
+	OnChangeBuildDelegate.AddDynamic(this, &UBuilderComponent::ChangeBuild);
+
+	if(OnChangeBuildDelegate.IsBound())
+	{
+		GEngine->AddOnScreenDebugMessage(-1,1.f,FColor::Blue, TEXT("Binded"));
+	}
+
 }
 
 void UBuilderComponent::LineTraceForBuild()
@@ -62,7 +75,7 @@ void UBuilderComponent::LineTraceForBuild()
 		
 	if(GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility, QueryParams))
 	{
-		if(CurrentBuildableActor == nullptr)
+		if(CurrentBuildableActor == nullptr && BuildableActor != nullptr)
 		{
 			CurrentBuildableActor = GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, HitResult.Location, CurrentRotation, FActorSpawnParameters());
 			CurrentBuildableActor->EnableGhostMode();
@@ -84,24 +97,26 @@ void UBuilderComponent::LineTraceForBuild()
 			}
 			
 			CurrentBuildableActor->SetActorLocationAndRotation(HitResult.Location, CurrentRotation);
-
 		}
 
 		if(const auto BuildableActorRef = Cast<ABuildableActor>((HitResult.GetActor())))
 		{
 			const FVector InverseVector = BuildableActorRef->GetActorTransform().InverseTransformPosition(HitResult.Location);
 
-			//todo add dynmic offset logic 
-			float OffSetX = 0; 
-			float OffSetY = 0; 
-			
+			float OffSetX = 0.f;
+			float OffSetY = 0.f;
+		
 			if(FMath::Abs(InverseVector.X) > FMath::Abs(InverseVector.Y))
 			{
-				OffSetX = 401 * FMath::Sign(InverseVector.X);
+				OffSetX = (BuildableActorRef->GetMeshOffset().X * .5f +
+						   CurrentBuildableActor->GetMeshOffset().X * .5f +
+						   (SpaceBetweenMeshes)) * FMath::Sign(InverseVector.X);
 			}
 			else
 			{
-				OffSetY = 401 * FMath::Sign(InverseVector.Y);
+				OffSetY = (BuildableActorRef->GetMeshOffset().Y * .5f +
+						   CurrentBuildableActor->GetMeshOffset().Y * .5f +
+						   (SpaceBetweenMeshes)) * FMath::Sign(InverseVector.Y);
 			}
 			
 			CurrentBuildableActor->SetActorLocationAndRotation(BuildableActorRef->GetActorTransform().GetLocation(), CurrentRotation);
@@ -127,6 +142,7 @@ void UBuilderComponent::PerformBuild()
 	}
 }
 
+//todo add localOffsetRotation
 void UBuilderComponent::RotateBuild()
 {
 	if(bIsBuilderModeActive && CurrentBuildableActor != nullptr)
@@ -140,4 +156,19 @@ void UBuilderComponent::RotateBuild()
 			CurrentRotation.Yaw = 90;
 		}
 	}
+}
+
+void UBuilderComponent::ChangeBuild(TSubclassOf<ABuildableActor> BuildActor)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Black, TEXT("WORKWORKWORK"));
+	BuildableActor = BuildActor;
+	
+	if(CurrentBuildableActor != nullptr)
+	{
+		CurrentBuildableActor->Destroy();
+		CurrentBuildableActor = nullptr;
+	}
+	
+	CurrentBuildableActor = GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, FVector::ZeroVector, CurrentRotation, FActorSpawnParameters());
+	CurrentBuildableActor->EnableGhostMode();
 }
