@@ -7,7 +7,7 @@
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "BuildableActor.h"
-#include "MyButton.h"
+#include "BuildTypeButton.h"
 
 void UBuildBar::Init(const TArray<TSubclassOf<ABuildableActor>>& BuildList)
 {
