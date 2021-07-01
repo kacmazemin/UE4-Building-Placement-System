@@ -86,3 +86,13 @@ void ABuildableActor::SetCannotBuildStyle()
 		MaterialInstanceDynamic->SetVectorParameterValue(FName("BaseColorVec"), {0.85, 0.25, 0.25, 0});
 	}
 }
+
+FVector ABuildableActor::GetMeshSize() const
+{
+	if(MeshComponent)
+	{
+		return MeshComponent->GetStaticMesh()->GetBoundingBox().GetSize();
+	}
+	
+	return FVector::ZeroVector;
+}

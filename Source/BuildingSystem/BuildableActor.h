@@ -35,6 +35,8 @@ public:
 	UFUNCTION()
     void SetCannotBuildStyle();
 
+	FVector GetMeshSize() const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
