@@ -53,6 +53,8 @@ private:
 
 	bool bIsBuilderModeActive = false;
 
+	bool bNeedRotate = false;
+
 	void LineTraceForBuild();
 
 	UPROPERTY()

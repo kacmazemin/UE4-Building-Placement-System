@@ -11,6 +11,14 @@ class UBoxComponent;
 class USceneComponent;
 class UMaterialInstanceDynamic;
 
+UENUM()
+enum EBuildType
+{
+	Unknown   UMETA(DisplayName = "Unknown"),
+	Floor     UMETA(DisplayName = "Floor"),
+    Wall      UMETA(DisplayName = "Wall"),
+};
+
 UCLASS()
 class BUILDINGSYSTEM_API ABuildableActor : public AActor
 {
@@ -37,6 +45,8 @@ public:
 
 	FVector GetMeshSize() const;
 
+	TEnumAsByte<EBuildType> GetBuildType() const { return BuildType; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -51,4 +61,7 @@ protected:
 
 	UPROPERTY()
 	UMaterialInstanceDynamic* MaterialInstanceDynamic = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Config")
+	TEnumAsByte<EBuildType> BuildType = EBuildType::Unknown;
 };

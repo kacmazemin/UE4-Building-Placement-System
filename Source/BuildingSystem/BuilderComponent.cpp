@@ -105,12 +105,22 @@ void UBuilderComponent::LineTraceForBuild()
 
 			float OffSetX = 0.f;
 			float OffSetY = 0.f;
+			bNeedRotate = false;
 		
 			if(FMath::Abs(InverseVector.X) > FMath::Abs(InverseVector.Y))
 			{
 				OffSetX = (BuildableActorRef->GetMeshSize().X * .5f +
 						   CurrentBuildableActor->GetMeshSize().X * .5f +
 						   (SpaceBetweenMeshes)) * FMath::Sign(InverseVector.X);
+				
+				bNeedRotate = CurrentBuildableActor->GetBuildType().GetValue() == EBuildType::Wall;
+
+				if(bNeedRotate)
+				{
+					OffSetX = OffSetX * .5f;
+					OffSetX = OffSetX + FMath::Sign(InverseVector.X) * CurrentBuildableActor->GetMeshSize().Y * .5f;
+				}
+
 			}
 			else
 			{
@@ -119,8 +129,14 @@ void UBuilderComponent::LineTraceForBuild()
 						   (SpaceBetweenMeshes)) * FMath::Sign(InverseVector.Y);
 			}
 			
-			CurrentBuildableActor->SetActorLocationAndRotation(BuildableActorRef->GetActorTransform().GetLocation(), CurrentRotation);
+			CurrentBuildableActor->SetActorLocation(BuildableActorRef->GetActorTransform().GetLocation());
 			CurrentBuildableActor->AddActorLocalOffset(FVector{OffSetX, OffSetY, 0});
+
+									
+			if(bNeedRotate)
+			{
+				CurrentBuildableActor->AddActorLocalRotation({0, 90, 0});
+			}
 		}
 	}
 }
@@ -134,7 +150,7 @@ void UBuilderComponent::PerformBuild()
 {
 	if(bCanBuild && bIsBuilderModeActive && CurrentBuildableActor != nullptr)
 	{
-		 GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, CurrentBuildableActor->GetActorLocation(), CurrentRotation, FActorSpawnParameters());
+		 GetWorld()->SpawnActor<ABuildableActor>(BuildableActor, CurrentBuildableActor->GetActorLocation(), CurrentBuildableActor->GetActorRotation(), FActorSpawnParameters());
 	}
 	else
 	{
